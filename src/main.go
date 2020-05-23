@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 
+	jwt "github.com/54b3r/ginBasic/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -52,12 +54,25 @@ func QueryPathParams(c *gin.Context) {
 		"age":     age,
 	})
 }
+
+func JwtSample(c *gin.Context) {
+	validToken, err := jwt.GenerateJWT()
+	if err != nil {
+		fmt.Fprintf(c.Writer, err.Error())
+	}
+
+	c.JSON(200, gin.H{
+		"access_token": validToken,
+	})
+}
+
 func main() {
 	r := gin.Default()
 	r.GET("/", IndexPage)
 	r.POST("/", PostHomepage)
 	r.GET("/query", QueryStringParams)          // /query?name=james&age=45
 	r.GET("/query/:name/:age", QueryPathParams) // /path/james/45
+	r.GET("/jwt/sample", JwtSample)
 
 	r.Run()
 }
